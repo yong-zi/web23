@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!--    使用jquery的ajax请求， 需先导库  -->
+<!--    type="text/javascript" 远程库（静态资源库）； src为静态资源库地址  -->
+    <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+    <!-- 创建三级菜单  select 下拉菜单-->
+<!--    使用Ajax 展现 需在上边引入jquery库 -->
+    <select id="province" onchange="loadCity()"></select>
+    <select id="city" onchange="loadTown()"></select>
+    <select id="town"></select>
+
+    <script>
+        $(function(){
+            loadProvince();
+        });
+
+        function loadProvince(){
+            loadCity(1, 'province', loadCity);
+        }
+
+        function loadCity(){
+            loadCity($('#province').value(), 'city', loadTown);
+        }
+
+        function loadTown(){
+            loadCity($('#city').val(), 'town');
+        }
+
+
+        function loadCity(pid, selectId, nextLoad){
+            $.get('/stu/getInfo/',{'pid':pid},function(result){
+                console.log(result.jcityList)
+                var cityList = JSON.parse(result.jcityList);
+                for (var i=1;i<cityList.length;i++){
+                    var city = cityList[i];
+                    console.log(city.pk);
+                    console.log(city.fields.cityname);
+
+                    $('#province').append("<option value='"+city.pk+"'>" + city.fields.cityname+"</option>");
+                }
+                if(nextLoad!=null){
+                    nextLoad();
+                }
+            });
+        };
+    </script>
+</body>
+</html>
